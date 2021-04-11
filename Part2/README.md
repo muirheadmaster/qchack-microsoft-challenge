@@ -2,7 +2,7 @@
  Welcome to our Project! We are so glad that you are here.
 
 ## Project Description:
-We explore an implementation of a quantum Oracle in a simplified version of the popular game <b>Battleship</b>. This project should be a great resource for those seeking to solidify their understanding on implementing quantum oracles, as well as using such oracles within Grover's algorithm. We do not require the user to provide any input.
+We explore an implementation of a quantum Oracle in a simplified version of the popular game <b>Battleship</b>. This project should be a great resource for those seeking to solidify their understanding on implementing quantum oracles, as well as using such oracles within Grover's algorithm. We do not require the user to provide any input in the process.
 
 ## Instructions on running the project:
 The entirety of the project can be run on a jupyter notebook server, and the content can be accessed at "Battleship.ipynb" with a Q# Kernel. 
