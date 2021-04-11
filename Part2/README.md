@@ -1,6 +1,6 @@
 # Problem Description and Instructions on Running the Project
  Welcome to our Project! We are so glad that you are here.
- <div><center><img src="https://user-images.githubusercontent.com/42923017/114302152-ce7c7680-9a95-11eb-97f8-e6a17c7144ea.png" alt="Richard's Battleship" width="300"/></center></div>
+ <div align="center"><img src="https://user-images.githubusercontent.com/42923017/114302152-ce7c7680-9a95-11eb-97f8-e6a17c7144ea.png" alt="Richard's Battleship" width="300"/></div>
 
 ## Project Description:
 We explore an implementation of a quantum Oracle in a simplified version of the popular game <b>Battleship</b>. This project should be a great resource for those seeking to solidify their understanding on implementing quantum oracles, as well as using such oracles within Grover's algorithm. We do not require the user to provide any input in the process.
