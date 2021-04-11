@@ -1,6 +1,6 @@
-# Problem Description and Instructions on Running the Project
-<div align="center">Welcome to our Project! We are so glad that you are here.
-<img src="https://user-images.githubusercontent.com/42923017/114302152-ce7c7680-9a95-11eb-97f8-e6a17c7144ea.png" alt="Richard's Battleship" width="300"/>
+# Problem Description and Instructions on Running the Project 
+<div align="center"> Welcome to our Project! We are so glad that you are here.
+<img src="https://user-images.githubusercontent.com/42923017/114302152-ce7c7680-9a95-11eb-97f8-e6a17c7144ea.png" alt="Richard's Battleship" width="300">
 </div>
 
 ## Project Description:
