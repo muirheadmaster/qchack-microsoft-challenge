@@ -67,36 +67,45 @@ namespace QCHack.Task4 {
                         TriangleSameColor([colorsRegister[e0], colorsRegister[e1], colorsRegister[e2]], ancilla[i]);
                     }
                 }
-            }
-            apply {
+            } apply {
                 // if the graph is triangle free, the ancilla should be |00...0>. Only flip target if this is the case
                 (ControlledOnInt(0, X))(ancilla, target);
             }
-        }
-        else {
+        } else {
             X(target);
         }
     }
 
     operation TriangleSameColor (inputs : Qubit[], output : Qubit) : Unit is Adj+Ctl {
-        use same01 = Qubit();
-        use same12 = Qubit();
-        use same20 = Qubit();
+        // use same01 = Qubit();
+        // use same12 = Qubit();
+        // use same20 = Qubit();
+        // within {
+        //     CX(inputs[0], same01);
+        //     CX(inputs[1], same01);
+
+        //     CX(inputs[1], same12);
+        //     CX(inputs[2], same12);
+
+        //     CX(inputs[2], same20);
+        //     CX(inputs[0], same20);
+
+        //     X(same01);
+        //     X(same12);
+        // } apply {
+        //     (Controlled X)([same01, same12], output);
+        // }
         within {
-            CX(inputs[0], same01);
-            CX(inputs[1], same01);
-
-            CX(inputs[1], same12);
-            CX(inputs[2], same12);
-
-            CX(inputs[2], same20);
-            CX(inputs[0], same20);
-
-            X(same01);
-            X(same12);
+            CNOT(inputs[1], inputs[0]);
+            CNOT(inputs[1], inputs[2]);
         } apply {
-            (Controlled X)([same01, same12], output);
+            Controlled X([inputs[0], inputs[2]], output);
+            CNOT(inputs[0], output);
+            CNOT(inputs[2], output);
         }
+        X(output);
+        // ControlledOnInt(0, X)(inputs, output);
+        // ControlledOnInt(7, X)(inputs, output);
     }
 
     // identical tuple predicate
@@ -112,9 +121,9 @@ namespace QCHack.Task4 {
         mutable t = 0; // counts number of valid triangles
 
         // iterate over all unique triples of vertices
-        for v0 in 0..(V - 1) {
-            for v1 in (v0 + 1)..(V - 1) {
-                for v2 in (v1 + 1)..(V - 1) {
+        for v0 in 0 .. (V - 1) {
+            for v1 in (v0 + 1) .. (V - 1) {
+                for v2 in (v1 + 1) .. (V - 1) {
                     
                     // tuple predicates
                     let isEqual01 = check((v0, v1), _);
