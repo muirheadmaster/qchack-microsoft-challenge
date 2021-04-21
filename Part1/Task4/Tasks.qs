@@ -47,109 +47,109 @@ namespace QCHack.Task4 {
         edges : (Int, Int)[], 
         colorsRegister : Qubit[], 
         target : Qubit
-    ) : Unit is Adj+Ctl 
-    {
+    ) : Unit is Adj+Ctl {
         // Core Implementation
 
-        // Store the number of triangles
-        if Length(edges) > 0 
-        {
+        if Length(edges) > 0 {
+            // Store all triangles and the number of triangles
             let (triangles, TriangleNumber) = allTriangles(V, edges);
 
-            // Alllocate array of qubits of size TriangleNumber, each qubit will indicate if a given triangle has all edges of same color
+            // Allocate array of qubits of size TriangleNumber, each qubit will indicate if a given triangle has all edges of same color
             use ancilla = Qubit[TriangleNumber];
 
-            within 
-            {
-                // iterate over all triangles
-                for i in 0 .. (TriangleNumber - 1) 
-                {
+            within {
+                // Iterate over all triangles
+                for i in 0 .. (TriangleNumber - 1) {
                     let (e0, e1, e2) = triangles[i]; // gives the tuple of edges' indices representing triangle i
-                    if e0 > 0 or e1 > 0 or e2 > 0 
-                    {
-                        // want to access the corresponding colors of the above edges, and track of they are the same color by 
-                        // applying operation defined below "TriangleSameColor, and writing result to the ith qubit of ancilla
+                    if e0 > 0 or e1 > 0 or e2 > 0 {
+                        // want to access the corresponding colors of the above edges, and track if they are the same color by 
+                        // applying operation defined below "TriangleSameColor", and writing result to the ith qubit of ancilla
                         TriangleSameColor([colorsRegister[e0], colorsRegister[e1], colorsRegister[e2]], ancilla[i]);
                     }
                 }
-            }
-            apply
-            {
-                // if the graph is triangle free, the ancilla should be |00...0>. Only flip target if this is the case
+            } apply {
+                // if the graph is triangle free, the ancilla should be |00...0⟩ - only flip target if this is the case
                 (ControlledOnInt(0, X))(ancilla, target);
             }
-        }
-        else
-        {
+        } else {
             X(target);
         }
     }
 
     operation TriangleSameColor (inputs : Qubit[], output : Qubit) : Unit is Adj+Ctl {
-        use same01 = Qubit();
-        use same12 = Qubit();
-        use same20 = Qubit();
+        // use same01 = Qubit();
+        // use same12 = Qubit();
+        // use same20 = Qubit();
+        // within {
+        //     CX(inputs[0], same01);
+        //     CX(inputs[1], same01);
+
+        //     CX(inputs[1], same12);
+        //     CX(inputs[2], same12);
+
+        //     CX(inputs[2], same20);
+        //     CX(inputs[0], same20);
+
+        //     X(same01);
+        //     X(same12);
+        // } apply {
+        //     (Controlled X)([same01, same12], output);
+        // }
+
         within {
-            CX(inputs[0], same01);
-            CX(inputs[1], same01);
-
-            CX(inputs[1], same12);
-            CX(inputs[2], same12);
-
-            CX(inputs[2], same20);
-            CX(inputs[0], same20);
-
-            X(same01);
-            X(same12);
+            CNOT(inputs[1], inputs[0]);
+            CNOT(inputs[1], inputs[2]);
         } apply {
-            (Controlled X)([same01, same12], output);
+            Controlled X([inputs[0], inputs[2]], output);
+            CNOT(inputs[0], output);
+            CNOT(inputs[2], output);
         }
+        X(output);
+
     }
 
-    //// identical tuple predicate
-    function check(tuple1: (Int, Int), tuple2: (Int, Int)) : Bool {
+    // identical tuple predicate
+    function check (tuple1: (Int, Int), tuple2: (Int, Int)) : Bool {
         let (a, b) = tuple1;
         let (c, d) = tuple2;
         return a == c and b == d;
     }
 
-// returns list of tuples (i, j, k) where edges[i], edges[j], edges[k] form a triangle
-function allTriangles ( V : Int, edges : (Int, Int)[]) : ((Int, Int, Int)[], Int) {
-    mutable triangles = new (Int, Int, Int)[Length(edges)];
-    mutable t = 0; // counts number of valid triangles
-    // iterate over all unique triples of vertices
-    for v0 in 0..(V - 1) {
-        for v1 in (v0 + 1)..(V - 1) {
-            for v2 in (v1 + 1)..(V - 1) {
-                
-                // tuple predicates
-                let isEqual01 = check((v0, v1), _);
-                let isEqual10 = check((v1, v0), _);
+    // returns list of tuples (i, j, k), where edges[i], edges[j], edges[k] form a triangle
+    function allTriangles ( V : Int, edges : (Int, Int)[]) : ((Int, Int, Int)[], Int) {
+        mutable triangles = new (Int, Int, Int)[Length(edges)];
+        mutable triN = 0; // counts number of valid triangles
 
-                let isEqual12 = check((v1, v2), _);
-                let isEqual21 = check((v2, v1), _);
+        // iterate over all unique triples of vertices
+        for v0 in 0 .. (V - 1) {
+            for v1 in (v0 + 1) .. (V - 1) {
+                for v2 in (v1 + 1) .. (V - 1) {
+                    
+                    // tuple predicates
+                    let isEqual01 = check((v0, v1), _);
+                    let isEqual10 = check((v1, v0), _);
 
-                let isEqual20 = check((v2, v0), _);
-                let isEqual02 = check((v0, v2), _);
-                
-                // indices of triangle edges
-                
-                let i = Max([IndexOf(isEqual01, edges), IndexOf(isEqual10, edges)]);
+                    let isEqual12 = check((v1, v2), _);
+                    let isEqual21 = check((v2, v1), _);
 
-                let j = Max([IndexOf(isEqual12, edges), IndexOf(isEqual21, edges)]);
-                
-                let k = Max([IndexOf(isEqual20, edges), IndexOf(isEqual02, edges)]);
-                
-                // insert triangle edge indices if triangle exists
-                if i >= 0 and j >= 0 and k >= 0 {
-                    set triangles w/= t <- (i, j, k);
-                    set t = t + 1;
-                } 
+                    let isEqual20 = check((v2, v0), _);
+                    let isEqual02 = check((v0, v2), _);
+                    
+                    // indices of triangle edges
+                    let i = Max([IndexOf(isEqual01, edges), IndexOf(isEqual10, edges)]);
+                    let j = Max([IndexOf(isEqual12, edges), IndexOf(isEqual21, edges)]);
+                    let k = Max([IndexOf(isEqual20, edges), IndexOf(isEqual02, edges)]);
+                    
+                    // insert triangle edge indices if triangle exists
+                    if i >= 0 and j >= 0 and k >= 0 {
+                        set triangles w/= triN <- (i, j, k);
+                        set triN = triN + 1;
+                    } 
+                }
             }
         }
+        return (triangles, triN);
     }
-    return (triangles, t);
-}
 
 }
 
